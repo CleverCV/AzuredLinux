@@ -1,5 +1,15 @@
+#include "idt.hpp"
+#include "pic.hpp"
+#include "keyboard.hpp"
+
 extern "C" void kernel_main()
 {
+    idt_init();
+    pic_remap();
+    keyboard_init();
+
+    asm volatile ("sti");
+
     volatile unsigned short* vga =
         reinterpret_cast<volatile unsigned short*>(0xB8000);
 

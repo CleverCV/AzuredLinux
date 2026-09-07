@@ -24,21 +24,22 @@ stack_bottom:
 stack_top:
 
 section .data
-align 4096
 
+align 4096
 pml4_table:
     dq pdpt_table + 0x003
 
+align 4096
 pdpt_table:
     dq pd_table + 0x003
 
+align 4096
 pd_table:
-    ; 512 entradas de 2 MiB = 1 GiB identity mapped
-%assign i 0
-%rep 512
-    dq (i * 0x200000) | 0x083
-%assign i i + 1
-%endrep
+    %assign i 0
+    %rep 512
+        dq (i * 0x200000) | 0x083
+        %assign i i + 1
+    %endrep
 
 section .text
 global _start
@@ -46,6 +47,8 @@ extern kernel_main
 
 _start:
     cli
+
+    mov word [0xB8000], 0x0F41
 
     ; Cargar nuestra pila
     mov esp, stack_top
@@ -92,6 +95,7 @@ _start:
     or eax, 1 << 8
     wrmsr
 
+
     ; Activar paginación + protección
     mov eax, cr0
     or eax, (1 << 31) | (1 << 0)
@@ -123,6 +127,13 @@ long_mode_start:
     jmp .hang
 
 no_cpuid:
+
+global idt_load
+
+idt_load:
+    lidt [rdi]
+    ret
+
 no_long_mode:
     cli
     hlt
