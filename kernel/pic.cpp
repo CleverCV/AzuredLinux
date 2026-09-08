@@ -54,8 +54,12 @@ void pic_remap()
     outb(PIC1_DATA, ICW4_8086);
     outb(PIC2_DATA, ICW4_8086);
 
-    outb(PIC1_DATA, mask1);
-    outb(PIC2_DATA, mask2);
+    // Bloquear todas las IRQ
+outb(PIC1_DATA, 0xFF);
+outb(PIC2_DATA, 0xFF);
+
+// Activar solamente IRQ0 (timer) e IRQ1 (keyboard)
+outb(PIC1_DATA, 0xFC);    
 }
 
 void pic_send_eoi(uint8_t irq)

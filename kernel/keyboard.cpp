@@ -1,4 +1,6 @@
 #include "keyboard.hpp"
+#include "shell.hpp"
+
 #include <stdint.h>
 
 static inline uint8_t inb(uint16_t port)
@@ -13,11 +15,6 @@ static inline uint8_t inb(uint16_t port)
 
     return value;
 }
-
-volatile unsigned short* vga =
-    reinterpret_cast<volatile unsigned short*>(0xB8000);
-
-static int cursor = 0;
 
 static const char keyboard_map[128] =
 {
@@ -47,7 +44,6 @@ extern "C" void keyboard_handler()
 {
     uint8_t scancode = inb(0x60);
 
-    // Ignorar key release
     if (scancode & 0x80)
         return;
 
@@ -57,11 +53,7 @@ extern "C" void keyboard_handler()
 
         if (c != 0)
         {
-            vga[cursor++] =
-                static_cast<unsigned short>(0x0F00 | c);
-
-            if (cursor >= 80)
-                cursor = 0;
+            shell_put_char(c);
         }
     }
 }
