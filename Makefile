@@ -19,11 +19,23 @@ BUILD = build
 
 KERNEL = $(BUILD)/kernel.elf
 BOOT   = $(BUILD)/boot.o
-KOBJ   = $(BUILD)/kernel.o $(BUILD)/idt.o $(BUILD)/pic.o $(BUILD)/keyboard.o $(BUILD)/shell.o
+KOBJ=$(BUILD)/kernel.o \
+     $(BUILD)/idt.o \
+     $(BUILD)/pic.o \
+     $(BUILD)/keyboard.o \
+     $(BUILD)/shell.o \
+     $(BUILD)/memory.o \
+     $(BUILD)/pmm.o
 
 ISO = $(BUILD)/AzuredLinux.iso
 
 all: $(ISO)
+
+$(BUILD)/memory.o: memory/memory.cpp
+	$(CXX) $(CXXFLAGS) -c memory/memory.cpp -o $(BUILD)/memory.o
+
+$(BUILD)/pmm.o: memory/pmm.cpp
+	$(CXX) $(CXXFLAGS) -c memory/pmm.cpp -o $(BUILD)/pmm.o
 
 $(BUILD)/pic.o: kernel/pic.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
